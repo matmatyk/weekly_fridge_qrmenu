@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Module docstring"""
-import sys
+"""
+This module generates lunch menu with QR codes linking to online recipes.
+It supports description on config file without recipe link, like
+"my mothers cake from family cookbook".
+"""
 import json
+import os
+import sys
 import datetime
 import calendar
 import locale
@@ -17,8 +22,8 @@ OTHERS_KEY = "others"
 OUTPUT_DIR = "ouptut"
 
 
-def read_menu(path):
-    """Empty docstring """
+def read_lunch_menu_from_file(path):
+    """Reads lunch menu from file. Accepts format described in README.md."""
     with open(path, 'r') as menu_file:
         menu_data = json.load(menu_file)
         return (menu_data[START_DATE_KEY],
@@ -26,8 +31,10 @@ def read_menu(path):
                 menu_data[OTHERS_KEY])
 
 
-def uri_validator(url_candidate):
-    """Empty docstring """
+def is_valid_url(url_candidate):
+    """
+    Validates whether 'url_candidate' is valid URL which links to some recipe.
+    """
     try:
         result = urlparse(url_candidate)
         return all([result.scheme, result.netloc, result.path])
@@ -39,21 +46,24 @@ def extract_valid_urls(data):
     """Empty docstring """
     links = []
     for url_candidate in data:
-        if not uri_validator(url_candidate):
+        if not is_valid_url(url_candidate):
             continue
         links.append(url_candidate)
     return links
 
 
 def get_title_for_url(page_url):
-    """Empty docstring """
+    """
+    Extracts page title (which usually is a dish name) and strips some rubbish,
+    which is some additional info (like page name).
+    """
     soup = BeautifulSoup(urllib.request.urlopen(page_url), features="lxml")
     split_title = soup.title.string.split("|")
     return split_title[0].replace("przepis Olga Smile", "").strip()
 
 
 def date_from_string(start_date_str):
-    """Empty docstring """
+    """Transforms date in format YYYY-MM-DD to date object."""
     try:
         return datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
     except ValueError:
@@ -61,18 +71,17 @@ def date_from_string(start_date_str):
         return None
 
 
-def find_first_monday(start_date_str):
-    """Empty docstring """
-    start_date = date_from_string(start_date_str)
-    MONDAY = 0
-    while start_date.weekday() != MONDAY:
+def date_of_first_weekday_containing(start_date):
+    """Returns first day of the week which contains 'start_date'."""
+    while start_date.weekday() != calendar.firstweekday():
         start_date = start_date - datetime.timedelta(days=1)
     return start_date
 
 
 def print_menu(start_date_str, menu_to_print, other_recipes):
     """Empty docstring """
-    current_day = find_first_monday(start_date_str)
+    current_day = date_of_first_weekday_containing(
+        date_from_string(start_date_str))
     result_str = """
 <head>
     <link rel="stylesheet" href="style.css">
@@ -97,7 +106,8 @@ def print_menu(start_date_str, menu_to_print, other_recipes):
         <tr>
             <td colspan="7">
             <h2>Tydzień """ + current_day.isoformat() + " --- " + \
-                (current_day + datetime.timedelta(days=6)).isoformat() + """</h2>
+                (current_day + datetime.timedelta(days=6)).isoformat() + \
+                """</h2>
             </td>
         </tr>
 """
@@ -152,7 +162,7 @@ def print_menu(start_date_str, menu_to_print, other_recipes):
 
 def do_processing(path):
     """Empty docstring """
-    (start_date, menu, others) = read_menu(path)
+    (start_date, menu, others) = read_lunch_menu_from_file(path)
     url_to_metadata = {}
     for url in extract_valid_urls(menu):
         title = get_title_for_url(url)
@@ -167,8 +177,9 @@ def do_processing(path):
     others_to_print = []
     for url in extract_valid_urls(others):
         title = get_title_for_url(url)
-        img_path = "images/" + \
-                   start_date + "-" + title.replace(" ", "-") + ".png"
+        img_path = os.path.join(OUTPUT_DIR, "images",
+                                start_date + "-" + title.replace(" ", "-") +
+                                ".png")
         qrcode.make(url).save(img_path)
         others_to_print.append({
             "title": title,
@@ -189,7 +200,8 @@ def do_processing(path):
         }
         current_day = current_day + datetime.timedelta(days=1)
 
-    with open('menu_'+start_date + '.html', 'w') as result_file:
+    with open(os.path.join(OUTPUT_DIR, 'menu_' + start_date + '.html'),
+              'w') as result_file:
         result_file.write(print_menu(start_date,
                                      menu_to_print,
                                      others_to_print))
