@@ -1,0 +1,5 @@
+calendar
+locale
+urllib
+qrcode
+bs4
