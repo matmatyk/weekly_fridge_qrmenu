@@ -1,0 +1,23 @@
+body {
+    text-align:center
+}
+table {
+    width: 100%;
+    <!--border-spacing: 2px;-->
+    table-layout: fixed;
+}
+th, td {
+    text-align: center;
+}
+td {
+    height: 120px;
+    vertical-align: bottom;
+    width: (100/7)% ;
+}
+img {
+    width: 150px;
+}
+h2 {
+    text-align: center;
+}
+
