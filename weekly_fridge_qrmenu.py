@@ -62,7 +62,9 @@ def get_title_for_url(page_url):
     """
     soup = BeautifulSoup(urllib.request.urlopen(page_url), features="lxml")
     split_title = soup.title.string.split("|")
-    return split_title[0].replace("przepis Olga Smile", "").strip()
+    return split_title[0].replace("przepis Olga Smile", "") \
+                         .replace("przepis", "") \
+                         .strip()
 
 
 def date_from_string(date_str):
