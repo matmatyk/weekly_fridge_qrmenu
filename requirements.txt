@@ -1,5 +1,3 @@
-calendar
-locale
-urllib
+urllib3
 qrcode
-bs4
+beautifulsoup4
