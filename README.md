@@ -83,9 +83,9 @@ We will use here [exemplary input file.][example_config].
 1. Run `./weekly_fridge_qrmenu.py example_input/menu.json`
 2. Open the result file in your favourite browser, eg. `chromium output/menu_2020-04-28.html`
 3. Print it horizontally on A4 paper:
-   ![Printing generated HTML file](images/menu_printing.png)
+   ![Printing generated HTML file](images/menu_printing.jpg)
 4. Put on your fridge:
-   ![Lunch menu on fridge](images/menu_on_fridge.png)
+   ![Lunch menu on fridge](images/menu_on_fridge.jpg)
 
 <!--_For more examples, please refer to the [Documentation](https://example.com)_-->
 
