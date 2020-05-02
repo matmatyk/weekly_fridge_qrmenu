@@ -110,7 +110,7 @@ def print_menu(start_date_str, menu_to_print, other_recipes):
             result_str += """
         <tr>
             <td colspan="7">
-            <h2>""" + current_day.isoformat() + " --- " + \
+            <h2>""" + current_day.isoformat() + " &mdash; " + \
                 (current_day + datetime.timedelta(days=6)).isoformat() + \
                 """</h2>
             </td>
